@@ -6,10 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.github.fragivity.navigator
 import com.github.fragivity.pop
 import com.zsqw123.demo.gallery.databinding.FragPicBinding
 
+/**
+ * 在使用 PicFragment 之前, 请务必传入 nowPicture
+ */
 class PicFragment : Fragment() {
     private lateinit var binding: FragPicBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +28,12 @@ class PicFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.bigIv.transitionName="clickedIv"
+        binding.bigIv.transitionName = "clickedIv"
+        Glide.with(this).load(nowPicture.getUrl(720)).into(binding.bigIv)
         binding.bigIv.setOnClickListener { navigator.pop() }
+    }
+
+    companion object {
+        lateinit var nowPicture: Picture
     }
 }
