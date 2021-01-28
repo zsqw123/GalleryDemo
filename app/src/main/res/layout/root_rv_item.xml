@@ -5,7 +5,7 @@
 
     <ImageView
         android:id="@+id/click_iv_item"
-        android:layout_width="match_parent"
-        android:scaleType="centerCrop"
-        android:layout_height="300dp" />
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:scaleType="centerCrop" />
 </FrameLayout>

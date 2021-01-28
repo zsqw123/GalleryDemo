@@ -1,9 +1,8 @@
 package com.zsqw123.demo.gallery
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.navigation.fragment.NavHostFragment
-import com.github.fragivity.loadRoot
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
 import com.zsqw123.demo.gallery.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -12,7 +11,8 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
-        navHostFragment.loadRoot(RootFragment::class)
+        supportFragmentManager.commit {
+            replace(R.id.frag_container,RootFragment())
+        }
     }
 }

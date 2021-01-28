@@ -1,18 +1,18 @@
 package com.zsqw123.demo.gallery
 
+import android.app.Activity
+import android.app.ActivityOptions
+import android.content.Intent
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.github.fragivity.MyNavHost
-import com.github.fragivity.navigator
-import com.github.fragivity.push
 import com.zsqw123.demo.gallery.databinding.FragRootBinding
 import com.zsqw123.demo.gallery.databinding.RootRvItemBinding
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +22,9 @@ import kotlinx.coroutines.withContext
 class RootFragment : Fragment(R.layout.frag_root) {
     private lateinit var binding: FragRootBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragRootBinding.inflate(layoutInflater, container, false)
+        reenterTransition = TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         return binding.root
     }
 
@@ -36,45 +37,42 @@ class RootFragment : Fragment(R.layout.frag_root) {
             val picsResp = service?.today()
             val body = picsResp?.body()
             if (body != null && picsResp.isSuccessful) {
+                val manyOfBody = mutableListOf<Picture>()
+                repeat(10) {
+                    manyOfBody.addAll(body)
+                }
                 withContext(Dispatchers.Main) {
-                    val adapter = RootAdapter(navigator, body)
+                    val adapter = RootAdapter(activity, manyOfBody)
                     binding.rootRv.adapter = adapter
-                    adapter.notifyDataSetChanged()
                 }
             }
         }
     }
 }
 
-class RootAdapter(private val naviHost: MyNavHost, private val picList: List<Picture>) : RecyclerView.Adapter<RootHolder>() {
+class RootAdapter(private val activity: Activity?, private val picList: List<Picture>) : RecyclerView.Adapter<RootHolder>() {
     private lateinit var binding: RootRvItemBinding
+    override fun getItemCount(): Int = picList.size
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RootHolder {
         binding = RootRvItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return RootHolder(binding)
     }
 
     override fun onBindViewHolder(holder: RootHolder, position: Int) {
-        holder.itemBinding.clickIvItem.apply {
-            val url = picList[position].getUrl(720)
-            println(url)
-            Glide.with(this).load(url).into(this)
-//            Glide.with(this).asBitmap().load(url).into(object : CustomTarget<Bitmap>() {
-//                override fun onLoadCleared(placeholder: Drawable?) {}
-//                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-//                    (this@apply).setImageBitmap(resource)
-//                }
-//            })
+        val pic = picList[position]
+        holder.itemBinding.clickIvItem.run {
+            Glide.with(this).load(pic.getUrl(720)).into(this)
             setOnClickListener {
-                transitionName = "clickedIv"
-                PicFragment.nowPicture = picList[position]
-                naviHost.push(PicFragment::class, null, FragmentNavigatorExtras(it to "clickedIv"))
+                it.transitionName = pic.pid
+                PicActivity.pics = picList
+                PicActivity.nowPos = position
+                PicActivity.nowDrawable = this.drawable
+                val intent = Intent(context, PicActivity::class.java)
+                val options = ActivityOptions.makeSceneTransitionAnimation(activity, it, pic.pid)
+                activity?.startActivity(intent, options.toBundle())
             }
         }
     }
-
-    override fun getItemCount(): Int = picList.size
-
-
 }
 
-class RootHolder(val itemBinding: RootRvItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {}
+class RootHolder(val itemBinding: RootRvItemBinding) : RecyclerView.ViewHolder(itemBinding.root)
