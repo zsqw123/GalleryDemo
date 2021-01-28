@@ -53,15 +53,16 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.0"
 
-    def room = "2.2.5"
-    implementation "androidx.room:room-runtime:$room"
-    kapt "androidx.room:room-compiler:$room"
-    implementation "androidx.room:room-ktx:$room"
+//    def room = "2.2.6"
+//    implementation "androidx.room:room-runtime:$room"
+//    kapt "androidx.room:room-compiler:$room"
+//    implementation "androidx.room:room-ktx:$room"
 
     // image
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
 
     // Fragivity
-    implementation 'com.github.fragivity:core:0.1.2'
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
+//    implementation 'com.github.fragivity:core:0.1.2'
 }
